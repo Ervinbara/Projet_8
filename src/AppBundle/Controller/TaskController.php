@@ -24,13 +24,13 @@ class TaskController extends Controller
     public function createAction(Request $request)
     {
         $task = new Task();
+        $task->setAuthor($this->getUser());
         $form = $this->createForm(TaskType::class, $task);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-
             $em->persist($task);
             $em->flush();
 
@@ -83,12 +83,16 @@ class TaskController extends Controller
      */
     public function deleteTaskAction(Task $task)
     {
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($task);
-        $em->flush();
-
-        $this->addFlash('success', 'La tâche a bien été supprimée.');
-
-        return $this->redirectToRoute('task_list');
+        if ($this->getUser()->getId() === $task->getAuthor()->getId() || $this->getUser()->getRoles() === "ROLE_ADMIN")
+        {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($task);
+            $em->flush();
+            $this->addFlash('success', 'La tâche a bien été supprimée.');
+            return $this->redirectToRoute('task_list');
+        }
+        else{
+            return $this->redirectToRoute('task_list');
+        }
     }
 }
