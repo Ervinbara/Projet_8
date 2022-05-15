@@ -39,6 +39,12 @@ class User implements UserInterface
      */
     private $email;
 
+
+    /**
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="author")
+     */
+    private $tasks;
+
     public function getId()
     {
         return $this->id;
@@ -86,5 +92,21 @@ class User implements UserInterface
 
     public function eraseCredentials()
     {
+    }
+
+
+    public function getTasks()
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task)
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks[] = $task;
+            $task->setAuthor($this);
+        }
+
+        return $this;
     }
 }
