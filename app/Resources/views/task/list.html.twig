@@ -21,11 +21,16 @@
                             {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
                         </button>
                     </form>
-
-{#                    {% if app.user.id is same as(task.author.id) or is_granted("ROLE_ADMIN") %}#}
+{#                    {{ dump(task.author.username) }}#}
                     {% if is_granted("task_edit",task) %}
-                        <a href="{{ path('task_delete', {'id' :  task.id }) }}"class="btn btn-danger btn-sm pull-right">Supprimer</a>
                         <a href="{{ path('task_edit', {'id' : task.id }) }}" class="btn btn-primary btn-sm pull-right">Modifier</a>
+                        {% if task.author.username is same as("anonyme") %}
+                            <a href="{{ path('task_delete', {'id' :  task.id }) }}"class="btn btn-danger btn-sm pull-right">Supprimer</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if is_granted("task_delete",task) %}
+                        <a href="{{ path('task_delete', {'id' :  task.id }) }}"class="btn btn-danger btn-sm pull-right">Supprimer</a>
                     {% endif %}
 
                 </div>

@@ -9,9 +9,10 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class taskVoter extends Voter
 {
-    // these strings are just invented: you can use anything
+    // Création de constante
     const TASK_EDIT = 'task_edit';
     const TASK_DELETE = 'task_delete';
+    const TASK_DELETE_ANONYMOUS = 'task_delete_anonymous';
 
     private $decisionManager;
 
@@ -44,24 +45,35 @@ class taskVoter extends Voter
             return false;
         }
 
-        if ($this->decisionManager->decide($token, ['ROLE_ADMIN'])) {
-            return true;
-        }
+//        if ($this->decisionManager->decide($token, ['ROLE_ADMIN'])) {
+//            return true;
+//        }
+
         // you know $task is a Post object, thanks to `supports()`
         /** @var Task $task */
 
         switch ($attribute) {
             case self::TASK_EDIT:
+                if ($this->decisionManager->decide($token, ['ROLE_ADMIN']) || $user === $task->getAuthor()) {
+                    return true;
+                }
+                else
+                    return false;
             case self::TASK_DELETE:
-                return $this->canEdit($task, $user);
+                return $this->canDelete($task, $user);
+//            case self::TASK_DELETE_ANONYMOUS:
+//                return $this->canDeleteAnonymous($task, $user);
         }
 
         throw new \LogicException('This code should not be reached!');
     }
 
-
-    private function canEdit(Task $task, User $user)
+    private function canDelete(Task $task, User $user)
     {
         return $user === $task->getAuthor();
     }
+//    private function canDeleteAnonymous(Task $task, User $user)
+//    {
+//        return $task->getAuthor()->getId() === 5;
+//    }
 }
