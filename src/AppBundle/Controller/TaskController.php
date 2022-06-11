@@ -93,14 +93,6 @@ class TaskController extends Controller
             $this->addFlash('success', 'La tâche a bien été supprimée.');
         }
 
-        if ($task->getAuthor()->getUsername() === "anonyme" && $this->isGranted(taskVoter::TASK_EDIT, $task) ){
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($task);
-            $em->flush();
-            $this->addFlash('success', 'La tâche a bien été supprimée.');
-        }
-
-
         return $this->redirectToRoute('task_list');
     }
 }
