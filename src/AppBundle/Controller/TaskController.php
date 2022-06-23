@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Task;
 use AppBundle\Form\TaskType;
+use AppBundle\Security\taskVoter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,13 +48,15 @@ class TaskController extends Controller
      */
     public function editAction(Task $task, Request $request)
     {
+        // On vérifie : Soit ADMIN ou Auteur
+        if (!$this->isGranted(taskVoter::TASK_EDIT, $task)) {
+            return $this->redirectToRoute('task_list');
+        }
+
         $form = $this->createForm(TaskType::class, $task);
-
         $form->handleRequest($request);
-
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
-
             $this->addFlash('success', 'La tâche a bien été modifiée.');
 
             return $this->redirectToRoute('task_list');
@@ -83,16 +86,13 @@ class TaskController extends Controller
      */
     public function deleteTaskAction(Task $task)
     {
-        if ($this->getUser()->getId() === $task->getAuthor()->getId() || $this->getUser()->getRoles() === "ROLE_ADMIN")
-        {
+        if ($this->isGranted(taskVoter::TASK_DELETE, $task)) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($task);
             $em->flush();
             $this->addFlash('success', 'La tâche a bien été supprimée.');
-            return $this->redirectToRoute('task_list');
         }
-        else{
-            return $this->redirectToRoute('task_list');
-        }
+
+        return $this->redirectToRoute('task_list');
     }
 }
