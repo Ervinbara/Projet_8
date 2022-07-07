@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
@@ -21,12 +22,11 @@ class SecurityControllerTest extends WebTestCase
             'PHP_AUTH_USER' => 'a',
             'PHP_AUTH_PW'   => 'azerty',
         ));
-//        $this->client = static::createClient();
+        $this->login();
     }
 
     public function testLogin()
     {
-        $this->login();
         $crawler = $this->client->request('GET', '/');
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -71,13 +71,6 @@ class SecurityControllerTest extends WebTestCase
     /**
      * Test access to Create User page with No Auth User - Redirect login & Flash error
      */
-    public function testAccessNoAuthCreateUser()
-    {
-        $crawler = $this->client->request('GET', '/admin/users/create');
-        // Trouver une assertiosn qui redirige vers une
-        $this->client->followRedirect();
-        // Vérif si on est bien retourner sur la page d'accueil
-        $this->assertSame('Se connecter', $crawler->filter('button')->text());
-    }
+
 
 }

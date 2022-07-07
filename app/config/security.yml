@@ -23,7 +23,8 @@ security:
                 always_use_default_target_path:  true
                 default_target_path:  /
             logout: ~
-            access_denied_handler: AppBundle\Security\AccessDeniedHandler
+#            access_denied_handler: AppBundle\Security\AccessDeniedHandler
+            access_denied_url: /
 
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }

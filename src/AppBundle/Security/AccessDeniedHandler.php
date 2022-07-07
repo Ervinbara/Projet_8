@@ -11,7 +11,7 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
 {
     public function handle(Request $request, AccessDeniedException $accessDeniedException)
     {
-        $content = "Pas gentil !";
-        return new Response($content, 403);
+        $content = "Erreur : Cette page n'existe pas =(";
+        return new Response($content, 404);
     }
 }
