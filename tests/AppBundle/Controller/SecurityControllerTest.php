@@ -68,9 +68,6 @@ class SecurityControllerTest extends WebTestCase
         $this->assertSame('Liste des utilisateurs', $crawler->filter('h1')->text());
     }
 
-    /**
-     * Test access to Create User page with No Auth User - Redirect login & Flash error
-     */
 
 
 }

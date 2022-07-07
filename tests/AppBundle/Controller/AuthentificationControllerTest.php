@@ -60,4 +60,24 @@ class AuthentificationControllerTest extends WebTestCase
         // Si on est connecter et essai d'accéder à une page de l'admin on est redirigé sur la homepage
         $this->assertSame('Bienvenue sur Todo List, l\'application vous permettant de gérer l\'ensemble de vos tâches sans effort !', $crawler->filter('h1')->text());
     }
+
+    /**
+     * Test Logout - Redirect login
+     */
+    public function testLogoutAuthUser()
+    {
+        $crawler = $this->client->request('GET', '/login');
+        $form = $crawler->selectButton('Se connecter')->form([
+            '_username' => 'ervin',
+            '_password' => 'azerty'
+        ]);
+        $this->client->submit($form);
+        // Si le formulaire est validé on est redirigée sur / (page d'accueil)
+        $this->assertRegExp('/\//',$this->client->getResponse()->headers->get('Location'));
+        // Déconnection
+        $crawler = $this->client->request('GET', '/logout');
+        // Une fois déconnecter on retourne sur la page de login
+        $this->assertRegExp('/\/login/',$this->client->getResponse()->headers->get('Location'));
+    }
+
 }
