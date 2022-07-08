@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_content.jpg') }}" alt="todo list">{% endblock %}
+
+{% block body %}
+    <a href="{{ path('task_create') }}" class="btn btn-info pull-right">Créer une tâche</a>
+    <div class="row">
+        {% for task in tasks %}
+            <div class="col-sm-4 col-lg-4 col-md-4">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h4 class="pull-right">
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </h4>
+                        <p>{{ task.content }}</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-success btn-sm pull-right disabled">
+                            Marquer comme faite
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                Il n'y a pas tâche marquée comme terminée. <a> href="{{ path('task_list') }}" </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

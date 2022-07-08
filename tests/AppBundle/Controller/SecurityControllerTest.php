@@ -2,19 +2,17 @@
 
 namespace Tests\AppBundle\Controller;
 
-use AppBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use tests\AppBundle\Traits\loginTest;
 
 class SecurityControllerTest extends WebTestCase
 {
     private $client = null;
+//    use loginTest;
 
     public function setUp():void
     {

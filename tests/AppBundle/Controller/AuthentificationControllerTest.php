@@ -4,6 +4,7 @@ namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthentificationControllerTest extends WebTestCase
 {
@@ -62,7 +63,7 @@ class AuthentificationControllerTest extends WebTestCase
     }
 
     /**
-     * Test Logout - Redirect login
+     * Test Logout - Redirection login
      */
     public function testLogoutAuthUser()
     {
@@ -76,8 +77,12 @@ class AuthentificationControllerTest extends WebTestCase
         $this->assertRegExp('/\//',$this->client->getResponse()->headers->get('Location'));
         // Déconnection
         $crawler = $this->client->request('GET', '/logout');
+//        $this->client->followRedirects(true);
+        $this->assertSame(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
         // Une fois déconnecter on retourne sur la page de login
-        $this->assertRegExp('/\/login/',$this->client->getResponse()->headers->get('Location'));
+        $this->assertSame('Se connecter', $crawler->filter('button')->text());
+//        $this->assertRegExp('/\/login/',$this->client->getResponse()->headers->get('Location'));
+
     }
 
 }
