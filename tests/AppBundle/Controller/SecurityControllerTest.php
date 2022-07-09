@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use tests\AppBundle\Traits\loginTest;
+use tests\AppBundle\Traits\LoginTest;
 
 class SecurityControllerTest extends WebTestCase
 {

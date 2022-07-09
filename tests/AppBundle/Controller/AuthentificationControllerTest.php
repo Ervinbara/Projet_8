@@ -15,7 +15,7 @@ class AuthentificationControllerTest extends WebTestCase
         $this->client = static::createClient();
     }
 
-    public function testNoAccessAdminPageNoAuth()
+    public function testAccessAdminPageNoAuth()
     {
         $this->client->request('GET', '/admin/users/create');
         $this->assertInstanceOf(RedirectResponse::class, $this->client->getResponse());
@@ -34,7 +34,7 @@ class AuthentificationControllerTest extends WebTestCase
         $this->assertRegExp('/\/login/',$this->client->getResponse()->headers->get('Location'));
     }
 
-    public function testSuccessfullLogin ()
+    public function testSuccessCorrectCredentials ()
     {
         $crawler = $this->client->request('GET', '/login');
         $form = $crawler->selectButton('Se connecter')->form([
@@ -44,10 +44,9 @@ class AuthentificationControllerTest extends WebTestCase
         $this->client->submit($form);
         // Si le formulaire est validé on est redirigée sur / (page d'acceuil)
         $this->assertRegExp('/\//',$this->client->getResponse()->headers->get('Location'));
-
     }
 
-    public function testNoAccessAdminPageWhenAuthWithUserRole() {
+    public function testAccessAdminPageWhenAuthWithUserRole() {
         $crawler = $this->client->request('GET', '/login');
         $form = $crawler->selectButton('Se connecter')->form([
             '_username' => 'ervin',
@@ -76,12 +75,14 @@ class AuthentificationControllerTest extends WebTestCase
         // Si le formulaire est validé on est redirigée sur / (page d'accueil)
         $this->assertRegExp('/\//',$this->client->getResponse()->headers->get('Location'));
         // Déconnection
-        $crawler = $this->client->request('GET', '/logout');
+        $this->client->request('GET', '/logout');
 //        $this->client->followRedirects(true);
         $this->assertSame(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
         // Une fois déconnecter on retourne sur la page de login
-        $this->assertSame('Se connecter', $crawler->filter('button')->text());
-//        $this->assertRegExp('/\/login/',$this->client->getResponse()->headers->get('Location'));
+//
+        $this->client->request('GET', '/');
+//        $this->assertSame('Se connecter', $crawler->filter('button')->text());
+        $this->assertRegExp('/\/login/',$this->client->getResponse()->headers->get('Location'));
 
     }
 
