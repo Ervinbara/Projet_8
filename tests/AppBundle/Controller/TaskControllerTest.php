@@ -2,6 +2,7 @@
 
 namespace Tests\AppBundle\Controller;
 
+use AppBundle\Entity\Task;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,9 +49,10 @@ class TaskControllerTest extends WebTestCase
      */
     public function testTasksDoneAccessNoAuth()
     {
-        $this->client->request('GET', '/tasks');
-        $this->assertSame(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
-        $this->assertRegExp('/\/login/',$this->client->getResponse()->headers->get('Location'));
+        $client = $this->getClientNoAuth();
+        $client->request('GET', '/tasksDone');
+        $this->assertSame(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
+        $this->assertRegExp('/\/login/',$client->getResponse()->headers->get('Location'));
     }
 
 
@@ -60,15 +62,15 @@ class TaskControllerTest extends WebTestCase
      */
     public function testCreateTaskFullData()
     {
-        $crawler = $this->client->request('GET', '/tasks/create');
-        $form = $crawler->selectButton('Se connecter')->form([
+        $client = $this->getClientUser();
+        $crawler = $client->request('GET', '/tasks/create');
+        $form = $crawler->selectButton('Ajouter')->form([
             'task[title]' => 'ervin',
             'task[content]' => 'azerty'
         ]);
-        $this->client->submit($form);
+        $client->submit($form);
 
-        $this->assertRegExp('/\/tasks/',$this->client->getResponse()->headers->get('Location'));
-        $this->assertSame('Superbe ! La tâche a été bien été ajoutée.', $crawler->filter('div.alert alert-success')->text());
+        $this->assertRegExp('/\/tasks/',$client->getResponse()->headers->get('Location'));
     }
 
     /**
@@ -76,16 +78,58 @@ class TaskControllerTest extends WebTestCase
      */
     public function testCreateTaskEmptyData()
     {
-        $crawler = $this->client->request('GET', '/tasks/create');
-        $form = $crawler->selectButton('Se connecter')->form([
+        $client = $this->getClientUser();
+        $crawler = $client->request('GET', '/tasks/create');
+        $form = $crawler->selectButton('Ajouter')->form([
             'task[title]' => null,
             'task[content]' => 'Bonjour'
         ]);
-        $this->client->submit($form);
+        $client->submit($form);
 
-        $this->assertRegExp('/\/tasks/create/',$this->client->getResponse()->headers->get('Location'));
+        $this->assertRegExp('/\/tasks/create/',$client->getResponse()->headers->get('Location'));
     }
 
     // Delete
+    /**
+     * Test user delete his own task
+     */
+    public function testDeleteTask() {
+        $client = $this->getClientUser();
+
+        $task = $client->getContainer()->get('doctrine')->getRepository(Task::class)->findOneBy(['title' => 'ervin']);
+        $taskId = $task->getId();
+
+        $client->request('GET', '/tasks/'. $taskId . '/delete');
+        $this->assertRegExp('/\/tasks/',$client->getResponse()->headers->get('Location'));
+
+    }
+
+    /**
+     * Test task delete no auth
+     */
+    public function testDeleteTaskNoAuth() {
+        $client = $this->getClientNoAuth();
+
+        $task = $client->getContainer()->get('doctrine')->getRepository(Task::class)->findOneBy(['title' => 'ervin']);
+        $taskId = $task->getId();
+
+        $client->request('GET', '/tasks/'. $taskId . '/delete');
+        $this->assertRegExp('/\/login/',$client->getResponse()->headers->get('Location'));
+
+    }
+
+    /**
+     * User trying to delete a task that does not belong to him
+     */
+    public function testDeleteTaskNoAuthorUser() {
+        $client = $this->getClientAdmin();
+
+        $task = $client->getContainer()->get('doctrine')->getRepository(Task::class)->findOneBy(['title' => 'ervin']);
+        $taskId = $task->getId();
+
+        $client->request('GET', '/tasks/'. $taskId . '/delete');
+        $this->assertRegExp('/\/tasks/',$client->getResponse()->headers->get('Location'));
+
+    }
 
 }
