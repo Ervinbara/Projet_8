@@ -76,6 +76,7 @@ class TaskControllerTest extends WebTestCase
     /**
      * Test Create Task with correct data - Redirect tasks to do list & Flash success
      */
+    // TODO : Ajouter un test sur le sur la classe .help-block lors de la montée de version symfony
     public function testCreateTaskEmptyData()
     {
         $client = $this->getClientUser();
